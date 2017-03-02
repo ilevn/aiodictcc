@@ -22,37 +22,41 @@ BASE_URL = "http://{subdomain}.dict.cc/?s={search}"
 
 
 class UnavailableLanguageError(Exception):
-    pass
+    def __init___(self, unsupported_lang):
+        Exception.__init__(self, "{} is not a supported language!".format(unsupported_lang))
+        self.unsupported_lang = unsupported_lang
 
 
 class Translate:
     @staticmethod
-    def filter(content: str):
+    def _filter(content):
+        """Filter the parsed content by sanitizing and searching for `c1Arr` and `c2Arr`."""
         def sanitize(word):
             return re.sub("[\\\\\"]", "", word)
 
+        match_pattern = "\"[^,]+\""
         in_list = []
         out_list = []
-        javascript_list_pattern = "\"[^,]+\""
-        print(content)
-        for line in content.split("\n"):
-            if "var c1Arr" in line:
-                in_list = list(map(sanitize, re.findall(javascript_list_pattern, line)))
-            elif "var c2Arr" in line:
-                out_list = list(map(sanitize, re.findall(javascript_list_pattern, line)))
-        return in_list, out_list
 
-    @classmethod
-    async def _make_request(cls, request_url):
+        for line in content.split("\\n"):
+            if "var c1Arr" in line:
+                in_list = map(sanitize, re.findall(match_pattern, line))
+            elif "var c2Arr" in line:
+                out_list = map(sanitize, re.findall(match_pattern, line))
+        return zip(in_list, out_list)
+
+    @staticmethod
+    async def _make_request(request_url):
+        """Internal function to request a page by using a given string"""
         session = aiohttp.ClientSession(
-            headers={'User-agent': 'Mozilla/5.0 (Windows NT 6.3;'
-                                   ' WOW64; rv:30.0) Gecko/20100101 Firefox/30.0'}
+            headers={'User-agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36'
+                                   ' (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36'}
         )
 
         async with session.get(request_url) as req:
             assert isinstance(req, aiohttp.ClientResponse)
 
-            return (await req.read()).decode()
+            return await req.read()
 
     @staticmethod
     def _parse_page(content):
@@ -63,11 +67,15 @@ class Translate:
             data = etree.HTML(content)
             # Let's hope this doesn't break.
             _root = data.xpath('//*[@id="maincontent"]/script[2]/text()')
-            return _root
+            return str(_root)
 
     @classmethod
-    async def get_translation(cls, word, from_lang, to_lang, url=BASE_URL):
+    async def get_translation(cls, word: str, from_lang: str, to_lang: str):
+        """Request a translation."""
 
+        # TODO: Exception handling
+
+        url = BASE_URL
         subdomain = from_lang.lower() + to_lang.lower()
 
         req_url = url.format(subdomain=subdomain, search=word)
@@ -77,8 +85,7 @@ class Translate:
         event = asyncio.get_event_loop()
         parsed = await event.run_in_executor(None, parse_part)
 
-        return cls.filter(str(parsed))
+        zipped_translation = cls._filter(parsed)
 
+        return list(zipped_translation)
 
-loop = asyncio.get_event_loop()
-print(loop.run_until_complete(Translate.get_translation("car", "en", "de")))
