@@ -15,7 +15,22 @@ AVAILABLE_LANGUAGES = {
     "ro": "romanian",
     "it": "italian",
     "pt": "portuguese",
-    "ru": "russian"
+    "ru": "russian",
+    "is": "icelandic",
+    "hu": "hungarian",
+    "la": "latin",
+    "nl": "dutch",
+    "sk": "slovakian",
+    "hr": "croatian",
+    "no": "norwegian",
+    "cs": "czech",
+    "fi": "finnish",
+    "tr": "turkish",
+    "da": "danish",
+    "pl": "polish",
+    "el": "greek",
+    "sr": "serbian",
+    "eo": "esperanto",
 }
 
 BASE_URL = "http://{subdomain}.dict.cc/?s={search}"
@@ -42,7 +57,7 @@ class Translate:
                 in_list = map(sanitize, re.findall(match_pattern, line))
             elif "var c2Arr" in line:
                 out_list = map(sanitize, re.findall(match_pattern, line))
-        return zip(in_list, out_list)
+        return zip(out_list, in_list)
 
     @staticmethod
     async def _make_request(request_url):
@@ -90,3 +105,4 @@ class Translate:
         zipped_translation = cls._filter(parsed)
 
         return list(zipped_translation)
+
