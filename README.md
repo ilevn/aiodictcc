@@ -20,10 +20,8 @@ loop = asyncio.get_event_loop()
 
 async def main():
     to_translate = input("Search: ")
-    # Query dict.cc.
-    await trans.
-    # Get translation for `word` en -> de.
-    translated = await trans.get_translation("word", "en", "de")
+    # Get translation for `to translate` en -> de.
+    translated = await trans.get_translation(to_translate, "en", "de")
     # Returns a list of tuples.
     print(translated)
 
