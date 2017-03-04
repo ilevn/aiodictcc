@@ -21,16 +21,15 @@ AVAILABLE_LANGUAGES = {
 BASE_URL = "http://{subdomain}.dict.cc/?s={search}"
 
 
-class UnavailableLanguageError(Exception):
-    def __init___(self, unsupported_lang):
-        Exception.__init__(self, "{} is not a supported language!".format(unsupported_lang))
-        self.unsupported_lang = unsupported_lang
+class UnavailableLanguageError(ValueError):
+    """Thrown if a language is not supported."""
 
 
 class Translate:
     @staticmethod
     def _filter(content):
         """Filter the parsed content by sanitizing and searching for `c1Arr` and `c2Arr`."""
+
         def sanitize(word):
             return re.sub("[\\\\\"]", "", word)
 
@@ -73,12 +72,12 @@ class Translate:
     async def get_translation(cls, word: str, from_lang: str, to_lang: str):
         """Request a translation."""
 
-        # TODO: Exception handling
+        for unsupported_language in [l for l in [from_lang, to_lang] if l not in AVAILABLE_LANGUAGES.keys()]:
+            raise UnavailableLanguageError("{} is not a supported language!".format(unsupported_language))
 
-        url = BASE_URL
         subdomain = from_lang.lower() + to_lang.lower()
 
-        req_url = url.format(subdomain=subdomain, search=word)
+        req_url = BASE_URL.format(subdomain=subdomain, search=word)
         response = await cls._make_request(request_url=req_url)
 
         parse_part = functools.partial(cls._parse_page, response)
@@ -88,4 +87,3 @@ class Translate:
         zipped_translation = cls._filter(parsed)
 
         return list(zipped_translation)
-
