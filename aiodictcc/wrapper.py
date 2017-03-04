@@ -70,7 +70,10 @@ class Translate:
 
     @classmethod
     async def get_translation(cls, word: str, from_lang: str, to_lang: str):
-        """Request a translation."""
+        """
+        Requests a translation.
+        Returns a list of tuples.
+        """
 
         for unsupported_language in [l for l in [from_lang, to_lang] if l not in AVAILABLE_LANGUAGES.keys()]:
             raise UnavailableLanguageError("{} is not a supported language!".format(unsupported_language))
