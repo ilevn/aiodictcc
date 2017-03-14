@@ -1,5 +1,7 @@
 import functools
 import re
+from typing import List, Tuple
+
 from lxml import etree
 
 import aiohttp
@@ -33,7 +35,7 @@ AVAILABLE_LANGUAGES = {
     "eo": "esperanto",
 }
 
-BASE_URL = "http://{subdomain}.dict.cc/?s={search}"
+BASE_URL = "https://{subdomain}.dict.cc/?s={search}"
 
 
 class UnavailableLanguageError(ValueError):
@@ -84,7 +86,7 @@ class Translate:
             return str(_root)
 
     @classmethod
-    async def get_translation(cls, word: str, from_lang: str, to_lang: str):
+    async def get_translation(cls, word: str, from_lang: str, to_lang: str) -> List[Tuple[str, str]]:
         """
         Requests a translation.
         Returns a list of tuples.
@@ -105,4 +107,3 @@ class Translate:
         zipped_translation = cls._filter(parsed)
 
         return list(zipped_translation)
-
