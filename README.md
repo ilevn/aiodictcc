@@ -3,11 +3,13 @@
 An `asnycio`-based  wrapper for [Dict.cc](http://dict.cc).
 
 ## Installation
-
 ```
-pip install git+https://github.com/ilevn/aiodictcc.git
+pip install aiodictcc
 ```
-
+For the latest development version:
+```
+pip install git+https://github.com/ilevn/aiodictcc
+```
 ## Example
 
 ```py
