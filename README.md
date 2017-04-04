@@ -1,6 +1,6 @@
 ## aiodictcc
 
-An `asnycio`-based  wrapper for [Dict.cc](http://dict.cc).
+An `asnycio`-based  wrapper for [Dict.cc](https://dict.cc).
 
 ## Installation
 ```
