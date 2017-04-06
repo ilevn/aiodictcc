@@ -41,6 +41,12 @@ BASE_URL = "https://{subdomain}.dict.cc/?s={search}"
 class UnavailableLanguageError(ValueError):
     """Thrown if a language is not supported."""
 
+    def __init__(self, message, error, *args):
+        self.message = message
+        self.error = error
+
+        super(UnavailableLanguageError, self).__init__(message, error, *args)
+
 
 class Translate:
     @staticmethod
@@ -93,7 +99,8 @@ class Translate:
         """
 
         for unsupported_language in [l for l in [from_lang, to_lang] if l not in AVAILABLE_LANGUAGES.keys()]:
-            raise UnavailableLanguageError("{} is not a supported language!".format(unsupported_language))
+            raise UnavailableLanguageError("{} is not a supported language!".format(unsupported_language),
+                                           error=unsupported_language)
 
         subdomain = from_lang.lower() + to_lang.lower()
 
