@@ -30,5 +30,5 @@ setup(
     author='Nils Theres',
     author_email='nilsntth@gmail.com',
     description='An asyncio-based wrapper for dict.cc',
-    install_requires=['aiohttp>=2.0.5', 'lxml==4.6.3']
+    install_requires=['aiohttp>=2.0.5', 'lxml==4.6.5']
 )
